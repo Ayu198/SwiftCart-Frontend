@@ -1,18 +1,28 @@
 import { Box, Button, Divider } from "@mui/material"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import OrderStepper from "./OrderStepper.tsx";
 import { Payments } from "@mui/icons-material";
+import { useAppDispatch, useAppSelector } from "../../../State/Store.ts";
+import { fetchOrderById, fetchOrderItemById } from "../../../State/customer/OrderSlice.ts";
+import { useEffect } from "react";
 
 const OrderDetails = () => {
     const navigate = useNavigate();
+    const { orderId, orderItemId } = useParams();
+    const dispatch = useAppDispatch();
+    const { orders } = useAppSelector(store => store);
+
+    useEffect(() => {
+        dispatch(fetchOrderById({ orderId: Number(orderId), jwt: localStorage.getItem("jwt") || "" })),
+            dispatch(fetchOrderItemById({ orderItemId: Number(orderItemId), jwt: localStorage.getItem("jwt") || "" }))
+    }, [])
     return (
         <Box className="space-y-5">
             <section className="flex flex-col gap-5 justify-center items-center">
-                <img className="w-[100px]" src="https://rukminim2.flixcart.com/image/1536/1536/xif0q/top/m/1/w/m-2-ms-crop-top-manish-enterprises-original-imahgfq7npn7wqfq.jpeg?q=90" />
+                <img className="w-[100px]" src={orders.orderItem?.product.images[0]} />
                 <div className="text-sm space-y-1 text-center">
-                    <h1 className="font-bold">H&M</h1>
-                    <p>Cropped, fitted top in soft ribbed jersey with a round neckline and short sleeves.|
-                        The model (height 5'8'') is wearing a size S | 95% Cotton, 5% Elastane</p>
+                    <h1 className="font-bold">{orders.orderItem?.product.seller?.businessDetails.businessName}</h1>
+                    <p>{orders.orderItem?.product.description}</p>
                     <p><strong>Size:</strong>S</p>
                 </div>
                 <div>
@@ -28,15 +38,18 @@ const OrderDetails = () => {
 
                 <div className="text-sm space-y-2">
                     <div className="flex gap-5 font-medium">
-                        <p>{"Swift"}</p>
+                        <p>{orders.currentOrder?.shippingAddress.name}</p>
 
                         <Divider flexItem orientation="vertical" />
 
-                        <p>{9354547924}</p>
+                        <p>{orders.currentOrder?.shippingAddress.mobile}</p>
                     </div>
 
                     <p>
-                        Gali No. 09, Madan Puri, Gurugram
+                        {`${orders.currentOrder?.shippingAddress.address}, 
+                        ${orders.currentOrder?.shippingAddress.state}, 
+                        ${orders.currentOrder?.shippingAddress.city}, 
+                        ${orders.currentOrder?.shippingAddress.pinCode}`}
                     </p>
                 </div>
             </div>
@@ -49,7 +62,8 @@ const OrderDetails = () => {
                             You saved {" "}
                             <span className="text-primary font-medium text-xs">
                                 ₹
-                                {"600"}
+                                {(orders.orderItem?.product?.mrpPrice ?? 0) -
+                                    (orders.orderItem?.product?.sellingPrice ?? 0)}
                                 .00
                             </span> {" "}
                             on this item
@@ -57,7 +71,7 @@ const OrderDetails = () => {
                     </div>
 
                     <p className="font-medium">
-                        ₹ 999.00
+                        ₹ {orders.orderItem?.sellingPrice}.00
                     </p>
                 </div>
 
@@ -71,7 +85,7 @@ const OrderDetails = () => {
                 <div className="px-5 pb-5">
                     <p className="text-xs">
                         <strong>Sold by : </strong>
-                        {"H&M"}
+                        {orders.orderItem?.product.seller?.businessDetails.businessName}
                     </p>
                 </div>
 

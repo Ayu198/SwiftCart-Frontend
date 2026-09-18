@@ -101,7 +101,7 @@ const FilterSection = () => {
                 prices.map((price) => (
                   <FormControlLabel
                   key = {price.name}
-                  value = {price.name}
+                  value = {`${price.min}-${price.max ?? ""}`}
                   control = {<Radio size = "small"/>}
                   label = {price.name}
                   />
@@ -134,7 +134,7 @@ const FilterSection = () => {
                 discounts.map((discount) => (
                   <FormControlLabel
                   key = {discount.name}
-                  value = {discount.name}
+                  value = {discount.value}
                   control = {<Radio size = "small"/>}
                   label = {discount.name}
                   />

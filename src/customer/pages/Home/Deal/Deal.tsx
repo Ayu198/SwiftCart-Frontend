@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import DealCard from "./DealCard";
+import { useAppSelector } from "../../../../State/Store";
 
 const Deal = () => {
   const autoplay = useRef(
@@ -27,16 +28,18 @@ const Deal = () => {
     emblaApi.reInit();
   }, [emblaApi]);
 
+  const {customer} = useAppSelector(store => store);
+
   return (
     <section className="w-full py-8">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {Array.from({ length: 10 }).map((_, index) => (
+          {customer.homePageData?.deals.map((item, index) => (
             <div
               key={index}
               className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_25%] px-3"
             >
-              <DealCard />
+              <DealCard item = {item} />
             </div>
           ))}
         </div>

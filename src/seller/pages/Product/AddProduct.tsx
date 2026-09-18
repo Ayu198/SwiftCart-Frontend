@@ -14,6 +14,8 @@ import { furnitureLevelThree } from '../../../data/category/level three/furnitur
 import { electronicsLevelThree } from '../../../data/category/level three/electronicsLevelThree';
 import { colors } from '../../../data/filter/color';
 import { mainCategory } from '../../../data/category/mainCategory';
+import { useAppDispatch } from '../../../State/Store';
+import { createProduct } from '../../../State/seller/sellerProductSlice';
 
 const categoryTwo: { [key: string]: any[] } = {
   men: menLevelTwo,
@@ -36,6 +38,7 @@ const categoryThree: { [key: string]: any[] } = {
 const AddProduct = () => {
   const [uploadImage, setUploadImage] = useState(false);
   const [snackbarOpen, setOpenSnackbar] = useState(false);
+  const dispatch = useAppDispatch();
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -52,6 +55,7 @@ const AddProduct = () => {
     },
     onSubmit: (value) => {
       console.log(value);
+      dispatch(createProduct({request:value , jwt:localStorage.getItem("jwt")}))
     }
   });
 

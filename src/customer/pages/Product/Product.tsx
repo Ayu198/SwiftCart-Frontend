@@ -1,15 +1,22 @@
 import { FilterAlt } from "@mui/icons-material";
 import { Box, Divider, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, useTheme, type SelectChangeEvent } from "@mui/material";
 import { useMediaQuery } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import FilterSection from "./FilterSection";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchAllProduct } from "../../../State/customer/ProductSlice";
+import { useParams, useSearchParams } from "react-router-dom";
 
 const Product = () => {
     const theme = useTheme();
     const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
     const [sort, setSort] = useState("price_low");
-    const [page , setPage] = useState(1);
+    const [page, setPage] = useState(1);
+    const dispatch = useAppDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { category } = useParams();
+    const {product} = useAppSelector(store => store)
 
     const handlePageChange = (value: number) => {
         setPage(value);
@@ -18,6 +25,24 @@ const Product = () => {
     const handleSortChange = (event: SelectChangeEvent) => {
         setSort(event.target.value);
     }
+
+    useEffect(() => {
+        const [minPrice , maxPrice] = searchParams.get('price')?.split("-")||[]
+        const color = searchParams.get("color");
+        const minDiscount = searchParams.get("discount")?Number(searchParams.get("discount")):undefined;
+        const pageNumber = page - 1;
+
+        const newFilter = {
+            color : color || "",
+            minPrice : minPrice?Number(minPrice):undefined,
+            maxPrice : maxPrice?Number(maxPrice):undefined,
+            minDiscount,
+            pageNumber,
+        }
+        dispatch(fetchAllProduct({
+            ...newFilter,category
+        }));
+    }, [category,searchParams]);
     return (
         <div className="-z-10 mt-10">
             <div>
@@ -60,15 +85,15 @@ const Product = () => {
                     </div>
                     <Divider />
                     <section className="product_section mt-7 grid sm:grid-cols-2 md:grid-cols:3 lg:grid-cols-4 gap-y-5 px-5 justify-center">
-                        {[1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1].map((index) => <ProductCard key={index} />)}
+                        {product.products.map((item) => <ProductCard item = {item} key={item.id} />)}
                     </section>
-                    <div className = "flex justify-center py-10">
+                    <div className="flex justify-center py-10">
                         <Pagination
                             onChange={(_, value) => handlePageChange(value)}
                             count={10}
                             variant="outlined"
                             shape="rounded"
-                            color = "primary"
+                            color="primary"
                         />
                     </div>
                 </div>

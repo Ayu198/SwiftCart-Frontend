@@ -4,40 +4,49 @@ import { Button } from "@mui/material";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { ModeComment } from "@mui/icons-material";
 import { teal } from "@mui/material/colors";
+import type { Product } from "../../../types/ProductTypes";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../State/Store";
+import { addProductToWishlist } from "../../../State/customer/WishlistSlice";
 
-const ProductCard = () => {
-    const images = [
-        "https://rukminim2.flixcart.com/image/1536/1536/xif0q/top/1/m/6/s-2-ms-crop-top-manish-enterprises-original-imahgfq7cc4pjf33.jpeg?q=90",
-        "https://rukminim2.flixcart.com/image/1536/1536/xif0q/top/m/1/w/m-2-ms-crop-top-manish-enterprises-original-imahgfq7npn7wqfq.jpeg?q=90",
-    ]
+const ProductCard = ({item}:{item:Product}) => {
     const [currentImage, setCurrentImage] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         let interval: any;
         if (isHovered) {
             interval = setInterval(() => {
-                setCurrentImage((prevImage) => (prevImage + 1) % images.length);
+                setCurrentImage((prevImage) => (prevImage + 1) % item.images.length);
             }, 1000);
         }
         return () => clearInterval(interval);
     }, [isHovered])
+
+    const handleWishlist = (event:React.MouseEvent) => {
+        event.stopPropagation();
+        item.id && dispatch(addProductToWishlist({productId : item.id}))
+    }
     return (
 
         <>
             <div className="group px-4 relative">
                 <div className="card"
+                onClick = {()=>navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     {
-                        images.map((image, index) => <img className="card-media object-top"
+                        item.images.map((image, index) => <img className="card-media object-top"
                             src={image} alt="Product Image" key={index}
                             style={{ transform: `translateX(${(index - currentImage) * 100}%)` }}
                         />)
                     } { isHovered && <div className="indicator flex flex-col items-center space-y-2">
                             <div className="flex gap-3">
-                                <Button
+                                <Button 
+                                    onClick = {handleWishlist}
                                     variant="contained"
                                     sx={{
                                         backgroundColor: "#FFFFFF",
@@ -76,18 +85,18 @@ const ProductCard = () => {
                 </div>
                 <div className = "details pt-3 space-y-1 group-hover-effect rounded-md">
                     <div className ="name">
-                        <h1>H&M</h1>
-                        <p>Black Crop Top</p>
+                        <h1>{item.seller?.businessDetails.businessName}</h1>
+                        <p>{item.title}</p>   
                     </div>
                     <div className = "price flex items-center gap-3">
                         <span className = "font-sans text-gray-800">
-                            ₹ 999
+                            ₹{item.sellingPrice}
                         </span>
                         <span className = "thin-line-through text-gray-400">
-                            ₹ 1675
+                            ₹{item.mrpPrice}
                         </span>
                         <span className = "text-primary font-semibold">
-                            60% off
+                            {item.discountPercent}%
                         </span>
                     </div>
                 </div>

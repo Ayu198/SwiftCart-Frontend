@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CategorySheet from './CategorySheet';
 import { mainCategory } from '../../../data/category/mainCategory';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../../State/Store';
 
 function Navbar() {
     const theme = useTheme();
@@ -14,6 +15,7 @@ function Navbar() {
     const [selectedCategory , setSelectedCategory] = useState("men");
     const[showCategorySheet , setShowCategorySheet] = useState(false);
     const navigate = useNavigate();
+    const {auth} = useAppSelector(store=>store);
   return (
     <>
         <Box className = "sticky top-0 left-0 right-0 bg-white" sx = {{zIndex : 2}}>
@@ -49,17 +51,17 @@ function Navbar() {
                         <SearchIcon/>
                     </IconButton>
                     {
-                        true? 
+                        auth.user? 
                         <Button onClick = {() => navigate("/account/orders")} className = "flex items-center gap-2">
                             <Avatar
                             sx = {{width: 29, height: 29}}
                             />
                             <h1 className = "font-semibold hidden lg:block"> 
-                                Swift
+                                {auth.user?.fullName}
                             </h1>
-                        </Button> : <Button variant='contained'>Login</Button>
+                        </Button> : <Button onClick = {()=>navigate("/login")} variant='contained'>Login</Button>
                     }
-                    <IconButton>
+                    <IconButton onClick = {()=>navigate("/wishlist")}>
                         <FavoriteBorderIcon sx = {{fontSize:29}}/>
                     </IconButton>
                     <IconButton onClick = {() => navigate("/cart")}>

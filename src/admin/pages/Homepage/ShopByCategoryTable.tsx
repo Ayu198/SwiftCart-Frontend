@@ -1,9 +1,12 @@
 import React from 'react'
+import HomeCategoryTable from './HomeCategoryTable'
+import { useAppSelector } from '../../../State/Store'
 
 const ShopByCategoryTable = () => {
+  const {customer} = useAppSelector(store => store);
   return (
-    <div>ShopByCategoryTable</div>
+    <div><HomeCategoryTable data = {customer.homePageData?.shopByCategories || []}/></div>
   )
 }
 
-export default ShopByCategoryTable
+export default ShopByCategoryTable  
